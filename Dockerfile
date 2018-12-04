@@ -19,13 +19,15 @@ RUN conda create --name py36 --yes \
       scipy \
       seaborn \
       statsmodels \
+      spacy \
  && conda clean -tipsy \
  && rm -fr /home/$NB_USER/{.cache,.conda,.npm}
 
 # packages not available in conda standard stream
 #TODO: does this version need to match nbextension?
-RUN /opt/conda/envs/py36/bin/pip install --no-cache-dir \
-      ipyleaflet
+COPY files/requirements.txt .
+RUN /opt/conda/envs/py36/bin/pip install --no-cache-dir -r requirements.txt \
+    && rm requirements.txt
 
 # Import matplotlib the first time to build the font cache.
 ENV DEFAULT_KERNEL_NAME=conda_py36 \
