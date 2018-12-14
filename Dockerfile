@@ -23,11 +23,20 @@ RUN conda create --name py36 --yes \
  && conda clean -tipsy \
  && rm -fr /home/$NB_USER/{.cache,.conda,.npm}
 
+# these are needed by extra hass deps that require a C compiler
+# and other C development libraries and header files
+RUN conda install -n py36 gcc_linux-64
+RUN conda install -n py36 gxx_linux-64
+RUN conda clean -tipsy
+RUN rm -fr /home/$NB_USER/{.cache,.conda,.npm}
+
 # packages not available in conda standard stream
 #TODO: does this version need to match nbextension?
 COPY files/requirements.txt .
-RUN /opt/conda/envs/py36/bin/pip install --no-cache-dir -r requirements.txt \
-    && rm requirements.txt
+
+RUN . activate py36 \
+    /opt/conda/envs/py36/bin/pip install --no-cache-dir -r requirements.txt && \
+    rm requirements.txt
 
 # Import matplotlib the first time to build the font cache.
 ENV DEFAULT_KERNEL_NAME=conda_py36 \
